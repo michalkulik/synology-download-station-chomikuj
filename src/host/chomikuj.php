@@ -46,6 +46,7 @@ class SynoFileHostingChomikuj
     private $password;
     private $hostinfo;
     private $apikey = null;
+    private $lastLoginError = null;
 
     public function __construct($url, $username, $password, $hostinfo)
     {
@@ -94,7 +95,9 @@ class SynoFileHostingChomikuj
         }
 
         if (false === $this->ensureApiKey()) {
-            $info[DOWNLOAD_ERROR] = ERR_REQUIRED_ACCOUNT;
+            $info[DOWNLOAD_ERROR] = ('credentials' === $this->lastLoginError)
+                ? ERR_REQUIRED_ACCOUNT
+                : ERR_TRY_IT_LATER;
             return $info;
         }
 
@@ -144,6 +147,11 @@ class SynoFileHostingChomikuj
 
     private function login()
     {
+        if ('' === $this->username || '' === $this->password) {
+            $this->lastLoginError = 'credentials';
+            return false;
+        }
+
         $response = $this->apiRequest(
             'POST',
             '/api/v3/account/login',
@@ -153,22 +161,27 @@ class SynoFileHostingChomikuj
         );
 
         if (!is_array($response)) {
+            $this->lastLoginError = 'network';
             $this->log('login: brak odpowiedzi API (' . $response . ')');
             return false;
         }
 
         if (!empty($response['ApiKey'])) {
             $this->apikey = $response['ApiKey'];
+            $this->lastLoginError = null;
             $this->saveCachedKey($response['ApiKey']);
             return true;
         }
 
         $code = isset($response['Code']) ? (int)$response['Code'] : -1;
         if (404 === $code) {
+            $this->lastLoginError = 'credentials';
             $this->log('login: konto "' . $this->username . '" nie istnieje');
         } elseif (401 === $code) {
+            $this->lastLoginError = 'credentials';
             $this->log('login: błędne hasło dla konta "' . $this->username . '"');
         } else {
+            $this->lastLoginError = 'unknown';
             $this->log('login: nieudane logowanie, kod ' . $code);
         }
 
