@@ -1,0 +1,11 @@
+{
+	"name": "Chomikuj",
+	"displayname": "Chomikuj.pl",
+	"description": "Wyszukiwarka plików Chomikuj.pl",
+	"version": "1.0.0",
+	"site": "https://chomikuj.pl",
+	"module": "search.php",
+	"type": "search",
+	"accountsupport": "no",
+	"class": "SynoDLMSearchChomikuj"
+}

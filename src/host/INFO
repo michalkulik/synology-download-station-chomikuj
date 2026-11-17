@@ -1,0 +1,11 @@
+{
+	"name": "Chomikuj",
+	"hostprefix": "chomikuj.pl",
+	"displayname": "Chomikuj.pl",
+	"version": "1.0.0",
+	"authentication": "yes",
+	"module": "chomikuj.php",
+	"class": "SynoFileHostingChomikuj",
+	"supporttasklist": "no",
+	"description": "Pobieranie plików z Chomikuj.pl (wymaga konta Chomikuj i dostępnego transferu)."
+}
